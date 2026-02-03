@@ -1,6 +1,42 @@
 #!/bin/bash
 
 # =================================================================
+# DOKPLOY TOTAL CLEANUP - RESET TO ZERO 1000%
+# =================================================================
+
+echo "--- 1. Menghapus Semua Docker Service (Swarm) ---"
+docker service rm $(docker service ls -q) 2>/dev/null || true
+
+echo "--- 2. Menghapus Semua Kontainer yang Berjalan ---"
+docker rm -f $(docker ps -aq) 2>/dev/null || true
+
+echo "--- 3. Keluar dari Docker Swarm Mode ---"
+docker swarm leave --force 2>/dev/null || true
+
+echo "--- 4. Menghapus Semua Volume (Data Database/Redis) ---"
+docker volume rm $(docker volume ls -q) 2>/dev/null || true
+docker volume prune -f 2>/dev/null || true
+
+echo "--- 5. Menghapus Semua Network Custom ---"
+docker network rm dokploy-network dokploy-network-v2 2>/dev/null || true
+docker network prune -f 2>/dev/null || true
+
+echo "--- 6. Menghapus Semua Docker Secrets (Password DB) ---"
+docker secret rm $(docker secret ls -q) 2>/dev/null || true
+
+echo "--- 7. Menghapus Folder Konfigurasi di Sistem ---"
+rm -rf /etc/dokploy
+
+echo "--- 8. Membersihkan Sisa-sisa Docker ---"
+docker system prune -a --volumes -f
+
+echo "---------------------------------------------------"
+echo -e "\033[0;32mSERVER SUDAH BERSIH TOTAL (RESET ZERO)!\033[0m"
+echo "Sekarang Anda bisa menjalankan script instalasi lagi."
+echo "---------------------------------------------------"
+
+
+# =================================================================
 # DOKPLOY MEGA-SCALE INSTALLER (CLEAN START)
 # =================================================================
 
